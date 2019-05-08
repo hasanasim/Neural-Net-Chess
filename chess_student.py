@@ -87,8 +87,18 @@ def main():
     TODO: Define the w weights between the input and the hidden layer and the w weights between the hidden layer and the 
     output layer according to the instructions. Define also the biases.
     """
+    # weights between input layer and hidden layer 
+    input_hidden_wts = np.random.uniform(0,1,n_input_layer*n_hidden_layer)/(n_input_layer*n_hidden_layer)
+    # weights between hidden layer and output layer
+    hidden_output_wts = np.random_uniform(0,1,n_hidden_layer*n_output_layer)/(n_hidden_layer*n_output_layer)
+    # bias for input layer 
+    bias_input = np.zeros(n_input_layer,)
+    # bias for hidden layer 
+    bias_hidden = np.zeros(n_hidden_layer,)
+    # bisa for output layer 
+    bias_output = np.zeros(n_output_layer,)
 
-
+    
 
 
     # YOUR CODES ENDS HERE
