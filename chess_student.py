@@ -87,6 +87,7 @@ def main():
     TODO: Define the w weights between the input and the hidden layer and the w weights between the hidden layer and the 
     output layer according to the instructions. Define also the biases.
     """
+    import numpy.matlib
     # weights between input laiyer and hidden layer 
     input_hidden_wts=np.random.uniform(0,1,(n_hidden_layer,n_input_layer));
     input_hidden_wts=np.divide(input_hidden_wts,np.matlib.repmat(np.sum(input_hidden_wts,1)[:,None],1,n_input_layer));
@@ -170,6 +171,7 @@ def main():
             # You need to compute the Q values as output of your neural
             # network. You can change the input of the function by adding other
             # data, but the input of the function is suggested. 
+          
             Q, out1 = Q_values(x, W1, W2, bias_W1, bias_W2)
 
             """
@@ -178,14 +180,19 @@ def main():
             FILL THE CODE
             Implement epsilon greedy policy by using the vector a and a_allowed vector: be careful that the action must
             be chosen from the a_allowed vector. The index of this action must be remapped to the index of the vector a,
-            containing all the possible actions. Create a vector calle da_agent that contains the index of the action 
+            containing all the possible actions. Create a vector called a_agent that contains the index of the action 
             chosen. For instance, if a_allowed = [8, 16, 32] and you select the third action, a_agent=32 not 3.
             """
             
-            
 
             a_agent = 1  # CHANGE THIS VALUE BASED ON YOUR CODE TO USE EPSILON GREEDY POLICY
-            
+            eGreedy = int(np.random.rand() < epsilon_f)
+            if eGreedy:
+                index = np.random.randint(len(allowed_a))
+                a_agent = allowed_a[index]
+            else:
+                a_agent = numpy.where(allowed_a == numpy.amax(allowed_a))[0][0]
+
             #THE CODE ENDS HERE. 
 
 
@@ -235,7 +242,7 @@ def main():
                 the action made. You computed previously Q values in the Q_values function. Be careful: this is the last 
                 iteration of the episode, the agent gave checkmate.
                 """
-
+                
 
                 # THE CODE ENDS HERE
 
