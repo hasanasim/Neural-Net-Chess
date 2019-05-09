@@ -87,10 +87,12 @@ def main():
     TODO: Define the w weights between the input and the hidden layer and the w weights between the hidden layer and the 
     output layer according to the instructions. Define also the biases.
     """
-    # weights between input layer and hidden layer 
-    input_hidden_wts = np.random.uniform(0,1,n_input_layer*n_hidden_layer)/(n_input_layer*n_hidden_layer)
+    # weights between input laiyer and hidden layer 
+    input_hidden_wts=np.random.uniform(0,1,(n_hidden_layer,n_input_layer));
+    input_hidden_wts=np.divide(input_hidden_wts,np.matlib.repmat(np.sum(input_hidden_wts,1)[:,None],1,n_input_layer));
     # weights between hidden layer and output layer
-    hidden_output_wts = np.random_uniform(0,1,n_hidden_layer*n_output_layer)/(n_hidden_layer*n_output_layer)
+    hidden_output_wts=np.random.uniform(0,1,(n_output_layer,n_hidden_layer));
+    hidden_output_wts=np.divide(hidden_output_wts,np.matlib.repmat(np.sum(hidden_output_wts,1)[:,None],1,n_hidden_layer));
     # bias for input layer 
     bias_input = np.zeros(n_input_layer,)
     # bias for hidden layer 
@@ -99,6 +101,7 @@ def main():
     bias_output = np.zeros(n_output_layer,)
 
     
+
 
 
     # YOUR CODES ENDS HERE
@@ -135,7 +138,7 @@ def main():
     
 
     for n in range(N_episodes):
-        epsilon_f = epsilon_0 / (1 + beta * n) #psilon is discounting per iteration to have less probability to explore
+        epsilon_f = epsilon_0 / (1 + beta * n) #epsilon is discounting per iteration to have less probability to explore
         checkmate = 0  # 0 = not a checkmate, 1 = checkmate
         draw = 0  # 0 = not a draw, 1 = draw
         i = 1  # counter for movements
