@@ -109,11 +109,11 @@ def main():
     # YOUR CODES ENDS HERE
 
     # Network Parameters
-    epsilon_0 = 0.2   #epsilon for the e-greedy policy
+    epsilon_0 = 0   #epsilon for the e-greedy policy
     beta = 0.00005    #epsilon discount factor
     gamma = 0.85      #SARSA Learning discount factor
     eta = 0.0035      #learning rate
-    N_episodes = 100000 #Number of games, each game ends when we have a checkmate or a draw
+    N_episodes = 10000 #Number of games, each game ends when we have a checkmate or a draw
 
     ###  Training Loop  ###
 
@@ -184,21 +184,19 @@ def main():
             containing all the possible actions. Create a vector called a_agent that contains the index of the action 
             chosen. For instance, if a_allowed = [8, 16, 32] and you select the third action, a_agent=32 not 3.
             """
-            
+            # Define reward vector (one position for each trial) and initialise it to zero
+            Rewards = np.zeros((1,N_episodes))
             x = x.reshape(50,1)
             a_agent = 1  # CHANGE THIS VALUE BASED ON YOUR CODE TO USE EPSILON GREEDY POLICY
             eGreedy = int(np.random.rand() < epsilon_f)
             if eGreedy:
-                print("egreedy")
                 index = np.random.randint(len(allowed_a)) 
                 a_agent = allowed_a[index]
-                print(a_agent)
             else:
-                print("else")
                 opt_action = max([Q[i] for i in allowed_a])
+               # print(Q)
                 a_agent = np.where(Q == opt_action)[0][0]
-                print(a_agent)
-
+             
             #THE CODE ENDS HERE. 
 
 
@@ -248,15 +246,30 @@ def main():
                 the action made. You computed previously Q values in the Q_values function. Be careful: this is the last 
                 iteration of the episode, the agent gave checkmate.
                 """
-                # Rectified output - a binary array with a single non-zero element corresponding to the selected action. This is in order to update the weights only to the neuron whose action was selected
-                rectOutput = np.zeros((50,1))
+                rectOutput = np.zeros((32,1))
                 rectOutput[a_agent,0] = 1
-                print("shape")
-                print(W1.shape)
-                print(((R - Q[a_agent])).shape)
-                print(rectOutput.shape)
-                print(x.T.shape)
-                W1 += eta * ((R - Q[a_agent]) * rectOutput.dot(x.T))
+
+                target = 1
+                # Backpropagation: output layer -> hidden layer
+                Qdelta = (target - Q) * rectOutput
+                W2 = W2 - (eta * np.outer(Qdelta, out1))
+
+                bias_W2 = eta * Qdelta
+                    
+                # Backpropagation: hidden -> input layer
+                # j = 200, i = 50
+                rectOutput2 = np.zeros((200,1))
+                for i in range(0,len(out1)):  
+                    rectOutput2[int(out1[i][0]),0] = 1
+                out1delta = np.dot(W2.T,Qdelta) * rectOutput2
+                
+                W1 = W1 + eta * np.outer(out1delta,x)
+                bias_W1 = eta * out1delta
+
+                Rewards[0,n] = R
+
+                
+                
 
                 # THE CODE ENDS HERE
 
@@ -275,7 +288,28 @@ def main():
                 the action made. You computed previously Q values in the Q_values function. Be careful: this is the last 
                 iteration of the episode, it is a draw.
                 """
-               
+
+                rectOutput = np.zeros((32,1))
+                rectOutput[a_agent,0] = 1
+
+                target = R
+                # Backpropagation: output layer -> hidden layer
+                Qdelta = (target - Q) * rectOutput
+                W2 = W2 + (eta * np.outer(Qdelta, out1))
+
+                bias_W2 = eta * Qdelta
+                    
+                # Backpropagation: hidden -> input layer
+                # j = 200, i = 50
+                rectOutput2 = np.zeros((200,1))
+                for i in range(0,len(out1)):  
+                    rectOutput2[int(out1[i][0]),0] = 1
+                out1delta = np.dot(W2.T,Qdelta) * rectOutput2
+                
+                W1 = W1 - eta * np.outer(out1delta,x)
+                bias_W1 = eta * out1delta
+
+                Rewards[0,n] = R
 
                 # YOUR CODE ENDS HERE
 
@@ -319,9 +353,40 @@ def main():
             iteration of the episode, the match continues.
             """
 
+            rectOutput = np.zeros((32,1))
+            rectOutput[a_agent,0] = 1
 
+            target = R+(gamma*max(Q_next))
+            # Backpropagation: output layer -> hidden layer
+            Qdelta = (target - Q) * rectOutput
+            W2 = W2 + (eta * np.outer(Qdelta, out1))
+
+            bias_W2 = eta * Qdelta
+                
+            # Backpropagation: hidden -> input layer
+            # j = 200, i = 50
+            rectOutput2 = np.zeros((200,1))
+            for i in range(0,len(out1)):  
+                rectOutput2[int(out1[i][0]),0] = 1
+            out1delta = np.dot(W2.T,Qdelta) * rectOutput2
+            
+            W1 = W1 + eta * np.outer(out1delta,x)
+            bias_W1 = eta * out1delta
+         
             # YOUR CODE ENDS HERE
             i += 1
+        alpha = 1/1000   
+        R_save[n, :] = ((1-alpha)*R_save[n-1,:]) + (alpha*R)
+        N_moves_save[n, :] = i
+        results = []
+    for i in range(0, len(R_save), 10):
+        results.append(sum(R_save[i:i+10]/10))
+    plt.plot(R_save)
+    plt.xlabel('moves')
+    plt.ylabel('reward')
+    plt.title('reward')
+    plt.show()
+    plt.savefig('b.png')
 
 
 if __name__ == '__main__':
