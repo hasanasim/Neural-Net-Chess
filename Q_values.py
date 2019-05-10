@@ -17,11 +17,14 @@ def Q_values(x, W1, W2, bias_W1, bias_W2):
     """
 
     # Neural activation: input layer -> hidden layer
-    out1 = 1 / (1 + np.exp(- W1.dot(x))) + bias_W1  # implementation of logsig
+    x = x.reshape(50,1)
+   
+    out1 = 1 / (1 + np.exp(- W1.dot(x))) # implementation of logsig
 
 
     # Neural activation: hidden layer -> output layer
-    Qvalue = 1 / (1 + np.exp(- W2.dot(x))) + bias_W2
+    bias_W2 = bias_W2.reshape(32,1)
+    Q = 1 / (1 + np.exp(- W2.dot(out1))) 
 
     # YOUR CODE ENDS HERE
     return Q, out1

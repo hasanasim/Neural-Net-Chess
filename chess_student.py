@@ -79,9 +79,9 @@ def main():
     refer to the number of nodes in the input layer and the number of nodes in the hidden layer respectively. The biases
      should be initialized with zeros.
     """
-    n_input_layer = 1  # Number of neurons of the input layer. TODO: Change this value
+    n_input_layer = 3*(size_board*size_board)+2  # Number of neurons of the input layer. TODO: Change this value
     n_hidden_layer = 200  # Number of neurons of the hidden layer
-    n_output_layer = 1  # Number of neurons of the output layer. TODO: Change this value accordingly
+    n_output_layer = 32  # Number of neurons of the output layer. TODO: Change this value accordingly
 
     """
     TODO: Define the w weights between the input and the hidden layer and the w weights between the hidden layer and the 
@@ -89,17 +89,18 @@ def main():
     """
     import numpy.matlib
     # weights between input laiyer and hidden layer 
-    input_hidden_wts=np.random.uniform(0,1,(n_hidden_layer,n_input_layer));
-    input_hidden_wts=np.divide(input_hidden_wts,np.matlib.repmat(np.sum(input_hidden_wts,1)[:,None],1,n_input_layer));
+    W1 = np.random.uniform(0,1,(n_hidden_layer,n_input_layer));
+    W1 = np.divide(W1,np.matlib.repmat(np.sum(W1,1)[:,None],1,n_input_layer));
     # weights between hidden layer and output layer
-    hidden_output_wts=np.random.uniform(0,1,(n_output_layer,n_hidden_layer));
-    hidden_output_wts=np.divide(hidden_output_wts,np.matlib.repmat(np.sum(hidden_output_wts,1)[:,None],1,n_hidden_layer));
-    # bias for input layer 
-    bias_input = np.zeros(n_input_layer,)
+    W2 = np.random.uniform(0,1,(n_output_layer,n_hidden_layer));
+    W2 = np.divide(W2,np.matlib.repmat(np.sum(W2,1)[:,None],1,n_hidden_layer));
+    print("shapes")
+    print(W1.shape)
+ 
     # bias for hidden layer 
-    bias_hidden = np.zeros(n_hidden_layer,)
+    bias_W1 = np.zeros(n_hidden_layer,)
     # bisa for output layer 
-    bias_output = np.zeros(n_output_layer,)
+    bias_W2 = np.zeros(n_output_layer,)
 
     
 
@@ -165,13 +166,13 @@ def main():
 
             # Computing Features
             x = features(p_q1, p_k1, p_k2, dfK2, s, check)
-
+            
             # FILL THE CODE 
             # Enter inside the Q_values function and fill it with your code.
             # You need to compute the Q values as output of your neural
             # network. You can change the input of the function by adding other
             # data, but the input of the function is suggested. 
-          
+            
             Q, out1 = Q_values(x, W1, W2, bias_W1, bias_W2)
 
             """
@@ -184,14 +185,19 @@ def main():
             chosen. For instance, if a_allowed = [8, 16, 32] and you select the third action, a_agent=32 not 3.
             """
             
-
+            x = x.reshape(50,1)
             a_agent = 1  # CHANGE THIS VALUE BASED ON YOUR CODE TO USE EPSILON GREEDY POLICY
             eGreedy = int(np.random.rand() < epsilon_f)
             if eGreedy:
-                index = np.random.randint(len(allowed_a))
+                print("egreedy")
+                index = np.random.randint(len(allowed_a)) 
                 a_agent = allowed_a[index]
+                print(a_agent)
             else:
-                a_agent = numpy.where(allowed_a == numpy.amax(allowed_a))[0][0]
+                print("else")
+                opt_action = max([Q[i] for i in allowed_a])
+                a_agent = np.where(Q == opt_action)[0][0]
+                print(a_agent)
 
             #THE CODE ENDS HERE. 
 
@@ -242,7 +248,15 @@ def main():
                 the action made. You computed previously Q values in the Q_values function. Be careful: this is the last 
                 iteration of the episode, the agent gave checkmate.
                 """
-                
+                # Rectified output - a binary array with a single non-zero element corresponding to the selected action. This is in order to update the weights only to the neuron whose action was selected
+                rectOutput = np.zeros((50,1))
+                rectOutput[a_agent,0] = 1
+                print("shape")
+                print(W1.shape)
+                print(((R - Q[a_agent])).shape)
+                print(rectOutput.shape)
+                print(x.T.shape)
+                W1 += eta * ((R - Q[a_agent]) * rectOutput.dot(x.T))
 
                 # THE CODE ENDS HERE
 
@@ -261,6 +275,7 @@ def main():
                 the action made. You computed previously Q values in the Q_values function. Be careful: this is the last 
                 iteration of the episode, it is a draw.
                 """
+               
 
                 # YOUR CODE ENDS HERE
 
@@ -303,6 +318,7 @@ def main():
             the action made. You computed previously Q values in the Q_values function. Be careful: this is not the last 
             iteration of the episode, the match continues.
             """
+
 
             # YOUR CODE ENDS HERE
             i += 1
