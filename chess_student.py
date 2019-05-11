@@ -81,8 +81,7 @@ def main():
     """
     n_input_layer = 3*(size_board*size_board)+2  # Number of neurons of the input layer. TODO: Change this value
     n_hidden_layer = 200  # Number of neurons of the hidden layer
-    n_output_layer = 32  # Number of neurons of the output layer. TODO: Change this value accordingly
-
+    n_output_layer = N_a  # Number of neurons of the output layer. TODO: Change this value accordingly
     """
     TODO: Define the w weights between the input and the hidden layer and the w weights between the hidden layer and the 
     output layer according to the instructions. Define also the biases.
@@ -98,10 +97,10 @@ def main():
     
     # bias for hidden layer 
     bias_W1 = np.zeros(n_hidden_layer,)
-    bias_W1 = bias_W1.reshape(200,1)
+    bias_W1 = bias_W1.reshape(n_hidden_layer,1)
     # bisa for output layer 
     bias_W2 = np.zeros(n_output_layer,)
-    bias_W2 = bias_W2.reshape(32,1)
+    bias_W2 = bias_W2.reshape(n_output_layer,1)
     
     # YOUR CODES ENDS HERE
 
@@ -251,7 +250,7 @@ def main():
                 # Backpropagation: output layer -> hidden layer
 
                 # rectified output
-                rectOutput = np.zeros((32,1))
+                rectOutput = np.zeros((n_output_layer,1))
                 rectOutput[a_agent,0] = 1
                 # update q-value
                 Qdelta = (target - Q) * rectOutput
@@ -261,7 +260,7 @@ def main():
                     
                 # Backpropagation: hidden -> input layer
                 #rectified output
-                rectOutput2 = np.zeros((200,1))
+                rectOutput2 = np.zeros((n_hidden_layer,1))
                 for j in range(0,len(out1)):  
                     rectOutput2[int(out1[j][0]),0] = 1
 
@@ -294,7 +293,7 @@ def main():
 
                 target = R
                 # Backpropagation: output layer -> hidden layer
-                rectOutput = np.zeros((32,1))
+                rectOutput = np.zeros((n_output_layer,1))
                 rectOutput[a_agent,0] = 1
                 Qdelta = (target - Q) * rectOutput
                 W2 = W2 + (eta * np.outer(Qdelta, out1))
@@ -302,7 +301,7 @@ def main():
                     
                 # Backpropagation: hidden -> input layer
                 # rectified output
-                rectOutput2 = np.zeros((200,1))
+                rectOutput2 = np.zeros((n_hidden_layer,1))
                 for j in range(0,len(out1)):  
                     rectOutput2[int(out1[j][0]),0] = 1
                 #update q
@@ -357,7 +356,7 @@ def main():
 
             target = R+(gamma*max(Q_next))
             # Backpropagation: output layer -> hidden layer
-            rectOutput = np.zeros((32,1))
+            rectOutput = np.zeros((n_output_layer,1))
             rectOutput[a_agent,0] = 1
             # update q 
             Qdelta = (target - Q) * rectOutput
@@ -367,7 +366,7 @@ def main():
                 
             # Backpropagation: hidden -> input layer
             #rectified output
-            rectOutput2 = np.zeros((200,1))
+            rectOutput2 = np.zeros((n_hidden_layer,1))
             for j in range(0,len(out1)):  
                 rectOutput2[int(out1[j][0]),0] = 1
             
@@ -402,9 +401,8 @@ def main():
     plt.plot(N_moves_save)
 
     plt.tight_layout()
-    plt.show()
     plt.savefig('Q2.png')
-
+    plt.show()
 
 if __name__ == '__main__':
     main()
