@@ -18,7 +18,6 @@ def Q_values(x, W1, W2, bias_W1, bias_W2):
     
     #reshape x to be usable in calculations
     x = x.reshape(50,1)
-    
     # Activation calculations using relu 
     # input layer to hidden layer 
     act1 = np.dot(W1,x) + bias_W1
