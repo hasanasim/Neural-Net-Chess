@@ -87,33 +87,30 @@ def main():
     TODO: Define the w weights between the input and the hidden layer and the w weights between the hidden layer and the 
     output layer according to the instructions. Define also the biases.
     """
+    
     import numpy.matlib
-    # weights between input laiyer and hidden layer 
+    # weights between input layer and hidden layer 
     W1 = np.random.uniform(0,1,(n_hidden_layer,n_input_layer));
     W1 = np.divide(W1,np.matlib.repmat(np.sum(W1,1)[:,None],1,n_input_layer));
     # weights between hidden layer and output layer
     W2 = np.random.uniform(0,1,(n_output_layer,n_hidden_layer));
     W2 = np.divide(W2,np.matlib.repmat(np.sum(W2,1)[:,None],1,n_hidden_layer));
-    print("shapes")
-    print(W1.shape)
- 
+    
     # bias for hidden layer 
     bias_W1 = np.zeros(n_hidden_layer,)
+    bias_W1 = bias_W1.reshape(200,1)
     # bisa for output layer 
     bias_W2 = np.zeros(n_output_layer,)
-
+    bias_W2 = bias_W2.reshape(32,1)
     
-
-
-
     # YOUR CODES ENDS HERE
 
     # Network Parameters
-    epsilon_0 = 1 #epsilon for the e-greedy policy
+    epsilon_0 = 0.2 #epsilon for the e-greedy policy
     beta = 0.00005    #epsilon discount factor
     gamma = 0.85      #SARSA Learning discount factor
     eta = 0.0035      #learning rate
-    N_episodes = 100000 #Number of games, each game ends when we have a checkmate or a draw
+    N_episodes = 100 #Number of games, each game ends when we have a checkmate or a draw
 
     ###  Training Loop  ###
 
@@ -186,15 +183,17 @@ def main():
             """
             # Define reward vector (one position for each trial) and initialise it to zero
             Rewards = np.zeros((1,N_episodes))
-            x = x.reshape(50,1)
-           # a_agent = 1  # CHANGE THIS VALUE BASED ON YOUR CODE TO USE EPSILON GREEDY POLICY
+            
+            a_agent = 1  # CHANGE THIS VALUE BASED ON YOUR CODE TO USE EPSILON GREEDY POLICY
+            
             eGreedy = int(np.random.rand() < epsilon_f)
+            # if egreedy then random, else use optimal move
             if eGreedy:
                 index = np.random.randint(len(allowed_a)) 
                 a_agent = allowed_a[index]
             else:
+                # get highest q value for an action which is allowed
                 opt_action = max([Q[j] for j in allowed_a])
-               # print(Q)
                 a_agent = np.where(Q == opt_action)[0][0]
              
             #THE CODE ENDS HERE. 
@@ -246,25 +245,31 @@ def main():
                 the action made. You computed previously Q values in the Q_values function. Be careful: this is the last 
                 iteration of the episode, the agent gave checkmate.
                 """
+
+                # target reward
+                target = R
+                # Backpropagation: output layer -> hidden layer
+
+                # rectified output
                 rectOutput = np.zeros((32,1))
                 rectOutput[a_agent,0] = 1
-
-                target = 1
-                # Backpropagation: output layer -> hidden layer
+                # update q-value
                 Qdelta = (target - Q) * rectOutput
+                # update weights 
                 W2 = W2 + (eta * np.outer(Qdelta, out1))
-
-                bias_W2 = eta * Qdelta
+                bias_W2 = bias_W2 + (eta * Qdelta)
                     
                 # Backpropagation: hidden -> input layer
-                # j = 200, i = 50
+                #rectified output
                 rectOutput2 = np.zeros((200,1))
                 for j in range(0,len(out1)):  
                     rectOutput2[int(out1[j][0]),0] = 1
+
+                #update q value
                 out1delta = np.dot(W2.T,Qdelta) * rectOutput2
-                
+                #update weights
                 W1 = W1 + (eta * np.outer(out1delta,x))
-                bias_W1 = eta * out1delta
+                bias_W1 = bias_W1 + (eta * out1delta)
 
                 
 
@@ -286,25 +291,25 @@ def main():
                 iteration of the episode, it is a draw.
                 """
 
-                rectOutput = np.zeros((32,1))
-                rectOutput[a_agent,0] = 1
 
                 target = R
                 # Backpropagation: output layer -> hidden layer
+                rectOutput = np.zeros((32,1))
+                rectOutput[a_agent,0] = 1
                 Qdelta = (target - Q) * rectOutput
                 W2 = W2 + (eta * np.outer(Qdelta, out1))
-
-                bias_W2 = eta * Qdelta
+                bias_W2 = bias_W2 +(eta * Qdelta)
                     
                 # Backpropagation: hidden -> input layer
-                # j = 200, i = 50
+                # rectified output
                 rectOutput2 = np.zeros((200,1))
                 for j in range(0,len(out1)):  
                     rectOutput2[int(out1[j][0]),0] = 1
+                #update q
                 out1delta = np.dot(W2.T,Qdelta) * rectOutput2
-                
+                # update weights and biases
                 W1 = W1 + (eta * np.outer(out1delta,x))
-                bias_W1 = eta * out1delta
+                bias_W1 =  bias_W1 + (eta * out1delta)
 
                 # YOUR CODE ENDS HERE
 
@@ -348,41 +353,57 @@ def main():
             iteration of the episode, the match continues.
             """
 
-            rectOutput = np.zeros((32,1))
-            rectOutput[a_agent,0] = 1
+            
 
             target = R+(gamma*max(Q_next))
             # Backpropagation: output layer -> hidden layer
+            rectOutput = np.zeros((32,1))
+            rectOutput[a_agent,0] = 1
+            # update q 
             Qdelta = (target - Q) * rectOutput
+            # update weights and biases 
             W2 = W2 + (eta * np.outer(Qdelta, out1))
-
-            bias_W2 = eta * Qdelta
+            bias_W2 = bias_W2 +(eta * Qdelta)
                 
             # Backpropagation: hidden -> input layer
-            # j = 200, i = 50
+            #rectified output
             rectOutput2 = np.zeros((200,1))
             for j in range(0,len(out1)):  
                 rectOutput2[int(out1[j][0]),0] = 1
-            out1delta = np.dot(W2.T,Qdelta) * rectOutput2
             
+            #update q 
+            out1delta = np.dot(W2.T,Qdelta) * rectOutput2
+            #update weights and biases 
             W1 = W1 + (eta * np.outer(out1delta,x))
-            bias_W1 = eta * out1delta
+            bias_W1 = bias_W1 + (eta * out1delta)
          
             # YOUR CODE ENDS HERE
             i += 1
-            #print(i)
+        # code for exponential moving average
         alpha = 1/10000   
         R_save[n, :] = ((1-alpha)*R_save[n-1,:]) + (alpha*R)
         N_moves_save[n, :] = ((1-alpha)*N_moves_save[n-1,:])+(alpha*i)
         results = []
-    # for i in range(0, len(R_save), 10):
-    #     results.append(sum(R_save[i:i+10]/10))
-    plt.plot(R_save)
+ 
+
+    # plot for question 2 
+    plt.subplot(211)
     plt.xlabel('number of games')
-    plt.ylabel('Exponential Moving Average of reward')
-    plt.title('reward')
+    plt.ylabel('EMA of reward')
+    plt.title('Q-learning reward')
+    plt.locator_params(axis='y', nbins=10,tight=True)
+    plt.plot(R_save)
+
+    plt.subplot(212)
+    plt.xlabel('number of games')
+    plt.ylabel('EMA of moves')
+    plt.title('Q-learning moves')
+    plt.locator_params(axis='y', nbins=10,tight=True)
+    plt.plot(N_moves_save)
+
+    plt.tight_layout()
     plt.show()
-    plt.savefig('b.png')
+    plt.savefig('Q2.png')
 
 
 if __name__ == '__main__':

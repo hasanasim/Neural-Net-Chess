@@ -15,18 +15,18 @@ def Q_values(x, W1, W2, bias_W1, bias_W2):
     there are othere possibilities, these are our suggestions
     YOUR CODE STARTS HERE
     """
-
+    
+    #reshape x to be usable in calculations
     x = x.reshape(50,1)
-
-    bias_W1 = bias_W1.reshape(200,1)
-    bias_W2 = bias_W2.reshape(32,1)
-
+    
+    # Activation calculations using relu 
+    # input layer to hidden layer 
     act1 = np.dot(W1,x) + bias_W1
-    out1 = relu(act1)
+    out1 = act1 * (act1>0)
+
+    # hidden layer to output layer 
     act2 = np.dot(W2,out1) + bias_W2
-    Q = relu(act2)
+    Q = act2 * (act2>0)
 
     # YOUR CODE ENDS HERE
     return Q, out1
-def relu(x):
-    return x * (x>0)
