@@ -79,7 +79,8 @@ def main():
     refer to the number of nodes in the input layer and the number of nodes in the hidden layer respectively. The biases
      should be initialized with zeros.
     """
-    sarsa = 1;
+    #change this to 0 for only q learning or 1 for q learning and sarsa
+    sarsa = 0;
     n_input_layer = 3*(size_board*size_board)+2  # Number of neurons of the input layer. TODO: Change this value
     n_hidden_layer = 200  # Number of neurons of the hidden layer
     n_output_layer = N_a  # Number of neurons of the output layer. TODO: Change this value accordingly
@@ -110,7 +111,7 @@ def main():
     beta = 0.00005    #epsilon discount factor
     gamma = 0.85      #SARSA Learning discount factor
     eta = 0.0035      #learning rate
-    N_episodes = 10000 #Number of games, each game ends when we have a checkmate or a draw
+    N_episodes = 100000 #Number of games, each game ends when we have a checkmate or a draw
 
     ###  Training Loop  ###
 
@@ -140,10 +141,26 @@ def main():
         runs = 1;
 
     # END OF SUGGESTIONS
+    # loop needed to produce figures comparing the two methods
     for run in range (runs):
         if sarsa and (run==0):
             sarsa = 1;
         else:
+            # must reset weights and biases to run again for different method
+
+            # weights between input layer and hidden layer 
+            W1 = np.random.uniform(0,1,(n_hidden_layer,n_input_layer));
+            W1 = np.divide(W1,np.matlib.repmat(np.sum(W1,1)[:,None],1,n_input_layer));
+            # weights between hidden layer and output layer
+            W2 = np.random.uniform(0,1,(n_output_layer,n_hidden_layer));
+            W2 = np.divide(W2,np.matlib.repmat(np.sum(W2,1)[:,None],1,n_hidden_layer));
+            
+            # bias for hidden layer 
+            bias_W1 = np.zeros(n_hidden_layer,)
+            bias_W1 = bias_W1.reshape(n_hidden_layer,1)
+            # bisa for output layer 
+            bias_W2 = np.zeros(n_output_layer,)
+            bias_W2 = bias_W2.reshape(n_output_layer,1)
             sarsa = 0;
         for n in range(N_episodes):
             epsilon_f = epsilon_0 / (1 + beta * n) #epsilon is discounting per iteration to have less probability to explore
@@ -415,7 +432,8 @@ def main():
                 N_moves_save[n, :] = ((1-alpha)*N_moves_save[n-1,:])+(alpha*i)
  
 
-    print(Q)
+    print(max(W1[0]))
+    print(W1[0])
     # plot for question 2 
     plt.subplot(211)
     plt.xlabel('number of games')
