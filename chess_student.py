@@ -109,7 +109,7 @@ def main():
     beta = 0.00005    #epsilon discount factor
     gamma = 0.85      #SARSA Learning discount factor
     eta = 0.0035      #learning rate
-    N_episodes = 100000 #Number of games, each game ends when we have a checkmate or a draw
+    N_episodes = 2000 #Number of games, each game ends when we have a checkmate or a draw
 
     ###  Training Loop  ###
 
@@ -180,11 +180,11 @@ def main():
             containing all the possible actions. Create a vector called a_agent that contains the index of the action 
             chosen. For instance, if a_allowed = [8, 16, 32] and you select the third action, a_agent=32 not 3.
             """
-            # Define reward vector (one position for each trial) and initialise it to zero
-            Rewards = np.zeros((1,N_episodes))
             
             a_agent = 1  # CHANGE THIS VALUE BASED ON YOUR CODE TO USE EPSILON GREEDY POLICY
             
+            # change to 0 for q-learning, 1 for sarsa
+            sarsa = 1;
             eGreedy = int(np.random.rand() < epsilon_f)
             # if egreedy then random, else use optimal move
             if eGreedy:
@@ -194,6 +194,7 @@ def main():
                 # get highest q value for an action which is allowed
                 opt_action = max([Q[j] for j in allowed_a])
                 a_agent = np.where(Q == opt_action)[0][0]
+                
              
             #THE CODE ENDS HERE. 
 
@@ -350,14 +351,29 @@ def main():
             rectified linear function as activation function (see supplementary materials). Exploit the Q value for 
             the action made. You computed previously Q values in the Q_values function. Be careful: this is not the last 
             iteration of the episode, the match continues.
-            """
+            """ 
+            if sarsa:
+                eGreedy = int(np.random.rand() < epsilon_f)
+                #if egreedy then random, else use optimal move
+                if eGreedy:
+                    index = np.random.randint(len(allowed_a)) 
+                    a_agent = allowed_a[index]
+                else:
+                    # get highest q value for an action which is allowed
+                    opt_action = max([Q[j] for j in allowed_a])
+                    a_agent = np.where(Q == opt_action)[0][0]
+                # target according to sarsa 
+                target = R+(gamma*(Q_next[a_agent]))
+                # rectified output for specified action
+                rectOutput = np.zeros((n_output_layer,1))
+                rectOutput[a_agent,0] = 1
+            else:
+                target = R+(gamma*max(Q_next))
+                rectOutput = np.zeros((n_output_layer,1))
+                rectOutput[a_agent,0] = 1
 
-            
-
-            target = R+(gamma*max(Q_next))
             # Backpropagation: output layer -> hidden layer
-            rectOutput = np.zeros((n_output_layer,1))
-            rectOutput[a_agent,0] = 1
+            
             # update q 
             Qdelta = (target - Q) * rectOutput
             # update weights and biases 
@@ -401,7 +417,7 @@ def main():
     plt.plot(N_moves_save)
 
     plt.tight_layout()
-    plt.savefig('Q2.png')
+    plt.savefig('figure.png')
     plt.show()
 
 if __name__ == '__main__':
