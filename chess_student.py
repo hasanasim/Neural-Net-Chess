@@ -8,7 +8,7 @@ from generate_game import *
 from Q_values import *
 
 size_board = 4
-
+np.random.seed(2)
 
 def main():
     """
@@ -75,27 +75,29 @@ def main():
     Define the network, the number of the nodes of the hidden layer should be 200, you should know the rest. The weights 
     should be initialised according to a uniform distribution and rescaled by the total number of connections between 
     the considered two layers. For instance, if you are initializing the weights between the input layer and the hidden 
-    layer each weight should be divided by (n_input_layer x n_hidden_layer), where n_input_layer and n_hidden_layer 
+    layer each weight should be divided by (n_input_layer x n_hidden_layer), where n_input_layefr and n_hidden_layer 
     refer to the number of nodes in the input layer and the number of nodes in the hidden layer respectively. The biases
      should be initialized with zeros.
     """
     #change this to 0 for only q learning or 1 for q learning and sarsa
-    sarsa = 0;
+    sarsa = 0
     n_input_layer = 3*(size_board*size_board)+2  # Number of neurons of the input layer. TODO: Change this value
     n_hidden_layer = 200  # Number of neurons of the hidden layer
     n_output_layer = N_a  # Number of neurons of the output layer. TODO: Change this value accordingly
+    
     """
     TODO: Define the w weights between the input and the hidden layer and the w weights between the hidden layer and the 
     output layer according to the instructions. Define also the biases.
-    """
-    
+    """ 
     import numpy.matlib
+    #np.random.seed(2)
     # weights between input layer and hidden layer 
     W1 = np.random.uniform(0,1,(n_hidden_layer,n_input_layer));
     W1 = np.divide(W1,np.matlib.repmat(np.sum(W1,1)[:,None],1,n_input_layer));
     # weights between hidden layer and output layer
     W2 = np.random.uniform(0,1,(n_output_layer,n_hidden_layer));
     W2 = np.divide(W2,np.matlib.repmat(np.sum(W2,1)[:,None],1,n_hidden_layer));
+    
     
     # bias for hidden layer 
     bias_W1 = np.zeros(n_hidden_layer,)
@@ -149,11 +151,11 @@ def main():
             # must reset weights and biases to run again for different method
 
             # weights between input layer and hidden layer 
-            W1 = np.random.uniform(0,1,(n_hidden_layer,n_input_layer));
-            W1 = np.divide(W1,np.matlib.repmat(np.sum(W1,1)[:,None],1,n_input_layer));
+            W1 = np.random.uniform(0,1,(n_hidden_layer,n_input_layer))
+            W1 = np.divide(W1,np.matlib.repmat(np.sum(W1,1)[:,None],1,n_input_layer))
             # weights between hidden layer and output layer
-            W2 = np.random.uniform(0,1,(n_output_layer,n_hidden_layer));
-            W2 = np.divide(W2,np.matlib.repmat(np.sum(W2,1)[:,None],1,n_hidden_layer));
+            W2 = np.random.uniform(0,1,(n_output_layer,n_hidden_layer))
+            W2 = np.divide(W2,np.matlib.repmat(np.sum(W2,1)[:,None],1,n_hidden_layer))
             
             # bias for hidden layer 
             bias_W1 = np.zeros(n_hidden_layer,)
@@ -431,9 +433,6 @@ def main():
                 R_save[n, :] = ((1-alpha)*R_save[n-1,:]) + (alpha*R)
                 N_moves_save[n, :] = ((1-alpha)*N_moves_save[n-1,:])+(alpha*i)
  
-
-    print(max(W1[0]))
-    print(W1[0])
     # plot for question 2 
     plt.subplot(211)
     plt.xlabel('number of games')
