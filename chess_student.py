@@ -90,7 +90,7 @@ def main():
     output layer according to the instructions. Define also the biases.
     """ 
     import numpy.matlib
-    #np.random.seed(2)
+    
     # weights between input layer and hidden layer 
     W1 = np.random.uniform(0,1,(n_hidden_layer,n_input_layer));
     W1 = np.divide(W1,np.matlib.repmat(np.sum(W1,1)[:,None],1,n_input_layer));
@@ -212,7 +212,7 @@ def main():
                 
                 a_agent = 1  # CHANGE THIS VALUE BASED ON YOUR CODE TO USE EPSILON GREEDY POLICY
                 
-                # change to 0 for q-learning, 1 for sarsa
+                
                 eGreedy = int(np.random.rand() < epsilon_f)
                 # if egreedy then random, else use optimal move
                 if eGreedy:
