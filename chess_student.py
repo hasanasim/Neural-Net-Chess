@@ -433,7 +433,7 @@ def main():
                 R_save[n, :] = ((1-alpha)*R_save[n-1,:]) + (alpha*R)
                 N_moves_save[n, :] = ((1-alpha)*N_moves_save[n-1,:])+(alpha*i)
  
-    # plot for question 2 
+    # plot  
     plt.subplot(211)
     plt.xlabel('number of games')
     plt.ylabel('EMA of reward')

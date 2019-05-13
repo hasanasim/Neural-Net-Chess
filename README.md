@@ -8,3 +8,5 @@
 Note : Please remember when moving from one experiment to the other to set the previously changed parameters back to their original.
 
 Runtime: 1,2,3 took approximately 30 minutes each on a dual-core i5 MacBook Pro. Experiment 4 took 1 hour. For quick testing change the number of episodes to 1000 or 100 for instant plots.
+
+Output of running is an interactive plot in Python. The plot is also saved as a .png file.
